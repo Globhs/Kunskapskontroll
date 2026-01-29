@@ -1,0 +1,8 @@
+MODEL_PATH = "yolov8n.pt"
+VIDEO_PATH = "Door_Test4.mp4"
+
+LINE_Y = 350
+MARGIN = 0
+
+COOLDOWN_FRAMES = 10
+CONFIDENCE = 0.4

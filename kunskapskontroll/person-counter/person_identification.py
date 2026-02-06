@@ -1,3 +1,6 @@
+import math
+
+
 class PersonIdentifier:
     """
     Hanterar ID-spårning baserat på position (cx, cy).
@@ -16,32 +19,32 @@ class PersonIdentifier:
         updated_tracks = {}
         used_ids = set()
 
+        if len(current_positions) == 1 and len(self.tracks) == 1:
+            pid = next(iter(self.tracks.keys()))
+            cx, cy = current_positions[0]
+            updated_tracks[pid] = {"cx": cx, "cy": cy, "last_seen": frame_count}
+            self.tracks = updated_tracks
+            return updated_tracks
+
         for cx, cy in current_positions:
             matched_id = None
-            min_dist = self.max_distance
+            best_dist = self.max_distance
 
             # försök match med redan sedda personer
             for pid, track in self.tracks.items():
-                dist = ((track["cx"] - cx) ** 2 + (track["cy"] - cy) ** 2) ** 0.5
-                if dist < min_dist and pid not in used_ids:
-                    min_dist = dist
+                if pid in used_ids:
+                    continue
+
+                dist = math.hypot(track["cx"] - cx, track["cy"] - cy)
+                if dist < best_dist:
+                    best_dist = dist
                     matched_id = pid
 
             if matched_id is not None:
-                # uppdatera spår
-                updated_tracks[matched_id] = {
-                    "cx": cx,
-                    "cy": cy,
-                    "last_seen": frame_count
-                }
+                updated_tracks[matched_id] = {"cx": cx, "cy": cy, "last_seen": frame_count}
                 used_ids.add(matched_id)
             else:
-                # skapa nytt ID
-                updated_tracks[self.next_id] = {
-                    "cx": cx,
-                    "cy": cy,
-                    "last_seen": frame_count
-                }
+                updated_tracks[self.next_id] = {"cx": cx, "cy": cy, "last_seen": frame_count}
                 used_ids.add(self.next_id)
                 self.next_id += 1
 
